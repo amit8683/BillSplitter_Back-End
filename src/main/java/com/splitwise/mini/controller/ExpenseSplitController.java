@@ -3,6 +3,7 @@ package com.splitwise.mini.controller;
 import java.util.List;
 
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,8 +28,14 @@ public class ExpenseSplitController {
         return expenseSplitService.getExpenseSplitsByExpenseId(expenseId);
     }
 
-    @PutMapping("/{splitId}/status")
-    public void updateSplitStatus(@PathVariable Integer splitId, @RequestParam String status) {
-        expenseSplitService.updateSplitStatus(splitId, status);
+    @PatchMapping("/request-payment/{splitId}")
+    public void SplitStatusToRequested(@PathVariable Integer splitId) {
+        expenseSplitService.ChangeSplitStatusToRequested(splitId);
     }
+    
+    @PatchMapping("/verify-payment/{splitId}")
+    public void SplitStatusToVerify(@PathVariable Integer splitId) {
+        expenseSplitService.ChangeSplitStatusToSettle(splitId);
+    }
+    
 }

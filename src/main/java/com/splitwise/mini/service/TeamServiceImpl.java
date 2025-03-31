@@ -1,5 +1,6 @@
 package com.splitwise.mini.service;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -28,28 +29,51 @@ public class TeamServiceImpl implements TeamService{
 	    @Autowired
 	    private TeamMemberRepository teamMemberRepository;
 
-	@Override
-	public TeamDTO createTeam(TeamDTO teamDTO) {
-		 Users creator = usersRepository.findById(teamDTO.getCreatedBy())
+	    @Override
+	    public TeamDTO createTeam(TeamDTO teamDTO) {
+	        System.out.print(teamDTO);
+
+	        // Find the creator (team owner)
+	        Users creator = usersRepository.findById(teamDTO.getCreatedBy())
 	                .orElseThrow(() -> new RuntimeException("Creator not found"));
-		 Team team = new Team();
+
+	        // Create and save the team
+	        Team team = new Team();
 	        team.setTeamName(teamDTO.getTeamName());
 	        team.setCreatedBy(creator);
 	        final Team savedTeam = teamRepository.save(team);
-	        List<Users> members = usersRepository.findByEmailIn(teamDTO.getMemberEmails());
-	        if (members.isEmpty()) {
-	            throw new RuntimeException("No valid users found for provided emails.");
-	        } 
-	     // Add users as team members
+
+	        List<Users> members = new ArrayList<>();
+
+	        // Check if memberEmails are provided and not just the creator
+	        if (teamDTO.getMemberEmails() != null && !teamDTO.getMemberEmails().isEmpty()) {
+	            members = usersRepository.findByEmailIn(teamDTO.getMemberEmails());
+
+	            if (members.isEmpty()) {
+	                throw new RuntimeException("No valid users found for provided emails.");
+	            }
+	        }
+
+	        // **Ensure creator is added explicitly as a team member**
+	        members.add(creator);
+
+	        // Convert users to TeamMember entities (including creator)
 	        List<TeamMember> teamMembers = members.stream()
 	                .map(user -> new TeamMember(savedTeam, user))
 	                .collect(Collectors.toList());
+
+	        // Save all team members (including creator)
 	        teamMemberRepository.saveAll(teamMembers);
 
-	        // Return DTO instead of entity
-	        return new TeamDTO(team.getTeamId(), team.getTeamName(), creator.getUserId(), teamDTO.getMemberEmails());
+	        // Return DTO with actual saved members
+	        return new TeamDTO(
+	            team.getTeamId(),
+	            team.getTeamName(),
+	            creator.getUserId(),
+	            members.stream().map(Users::getEmail).collect(Collectors.toList()) // Return actual saved members
+	        );
+	    }
 
-	}
 	
 	@Override
 	public List<TeamDTO> getUserTeams(Integer userId) {
@@ -86,5 +110,18 @@ public class TeamServiceImpl implements TeamService{
                 .map(user -> new UserDTO(user.getUserId(), user.getUsername(), user.getEmail()))
                 .collect(Collectors.toList());
     }
+	
+	@Override
+	public TeamDTO getTeamById(Integer teamId) {
+	    Team team = teamRepository.findById(teamId)
+	            .orElseThrow(() -> new RuntimeException("Team not found with ID: " + teamId));
+
+	    return new TeamDTO(
+	            team.getTeamId(),
+	            team.getTeamName(),
+	            team.getCreatedBy().getUserId()
+	           );
+	}
+
 
 }

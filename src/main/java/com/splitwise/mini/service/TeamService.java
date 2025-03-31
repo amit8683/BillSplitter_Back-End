@@ -9,4 +9,5 @@ public interface TeamService {
 	 TeamDTO createTeam(TeamDTO teamDTO);
 	 List<TeamDTO> getUserTeams(Integer userId);
 	List<UserDTO> getCreatorsByIds(List<Integer> creatorIds);
+	public TeamDTO getTeamById(Integer teamId);
 }

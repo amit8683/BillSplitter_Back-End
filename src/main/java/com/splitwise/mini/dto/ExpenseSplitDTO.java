@@ -15,4 +15,14 @@ public class ExpenseSplitDTO {
     private Integer expenseId;
     private Integer userId;
     private BigDecimal amount;
-}
+    
+    public ExpenseSplitDTO(Integer splitId, Integer expenseId, Integer userId, BigDecimal amount) {
+		super();
+		this.splitId = splitId;
+		this.expenseId = expenseId;
+		this.userId = userId;
+		this.amount = amount;
+	}
+
+	private String status;
+} 

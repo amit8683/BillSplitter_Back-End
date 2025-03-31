@@ -12,6 +12,14 @@ public class TeamDTO {
     private Integer teamId;
     private String teamName;
     private Integer createdBy;
-    private List<String> memberEmails;
+    
+    public TeamDTO(Integer teamId, String teamName, Integer createdBy) {
+		super();
+		this.teamId = teamId;
+		this.teamName = teamName;
+		this.createdBy = createdBy;
+	}
+
+	private List<String> memberEmails;
 }
 

@@ -19,41 +19,51 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+/**
+ * JWT authentication filter that processes each request to verify 
+ * and authenticate JWT tokens before reaching secured endpoints.
+ */
 @Component
 public class JwtFilter extends OncePerRequestFilter {
 
-	@Autowired
-	private JWTService jwtService;
-	
-	@Autowired
-	ApplicationContext context;
-	
-	@Override
-	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
-			throws ServletException, IOException {
-		 String authHeader=request.getHeader("Authorization");
-		 System.out.print(authHeader);		
-		 String token="";
-		 String username=null;
-		  
-		 if(authHeader != null && authHeader.startsWith("Bearer ")) {
-			 token =authHeader.substring(7);
-			 username=jwtService.extractUserName(token);
-		 }
-		 
-		 if(username != null && SecurityContextHolder.getContext().getAuthentication()==null) {
-			   
-			 UserDetails userDetails = context.getBean(UsersDetailService.class).loadUserByUsername(username);
-			 
-			 if(jwtService.validateToken(token,userDetails)) {
-				 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userDetails,null,userDetails.getAuthorities());
-				 authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-				 SecurityContextHolder.getContext().setAuthentication(authToken);
-			 }
-			 
-		 }
-		 filterChain.doFilter(request, response);
-		
-	}
+    @Autowired
+    private JWTService jwtService;
+    
+    @Autowired
+    private ApplicationContext context;
 
+    /**
+     * Filters each incoming request to validate the JWT token.
+     * If valid, sets authentication in the SecurityContext.
+     */
+    @Override
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+            throws ServletException, IOException {
+        
+        String authHeader = request.getHeader("Authorization");
+        System.out.print("Yeah Auth vala " + authHeader); // Debugging log
+        
+        String token = "";
+        String email = null;
+        
+        // Extract token if Authorization header is present and starts with 'Bearer '
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            token = authHeader.substring(7);
+            email = jwtService.extractUserName(token);
+        }
+
+        // Authenticate user if token is valid and not already authenticated
+        if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+            UserDetails userDetails = context.getBean(UsersDetailService.class).loadUserByUsername(email);
+            
+            if (jwtService.validateToken(token, userDetails)) {
+                UsernamePasswordAuthenticationToken authToken = 
+                    new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                SecurityContextHolder.getContext().setAuthentication(authToken);
+            }
+        }
+
+        filterChain.doFilter(request, response);
+    }
 }
