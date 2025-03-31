@@ -11,7 +11,7 @@ import com.splitwise.mini.entity.Users;
 import com.splitwise.mini.service.UsersService;
 
 @RestController
-@RequestMapping("/api/users") // Base URL for all user-related operations
+@RequestMapping("/api/users") 
 public class UserController {
 
     @Autowired

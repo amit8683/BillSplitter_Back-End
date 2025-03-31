@@ -31,21 +31,17 @@ public class TeamServiceImpl implements TeamService{
 
 	    @Override
 	    public TeamDTO createTeam(TeamDTO teamDTO) {
-	        System.out.print(teamDTO);
-
-	        // Find the creator (team owner)
+	
 	        Users creator = usersRepository.findById(teamDTO.getCreatedBy())
 	                .orElseThrow(() -> new RuntimeException("Creator not found"));
 
-	        // Create and save the team
 	        Team team = new Team();
 	        team.setTeamName(teamDTO.getTeamName());
 	        team.setCreatedBy(creator);
 	        final Team savedTeam = teamRepository.save(team);
 
 	        List<Users> members = new ArrayList<>();
-
-	        // Check if memberEmails are provided and not just the creator
+	        
 	        if (teamDTO.getMemberEmails() != null && !teamDTO.getMemberEmails().isEmpty()) {
 	            members = usersRepository.findByEmailIn(teamDTO.getMemberEmails());
 
@@ -54,18 +50,13 @@ public class TeamServiceImpl implements TeamService{
 	            }
 	        }
 
-	        // **Ensure creator is added explicitly as a team member**
 	        members.add(creator);
-
-	        // Convert users to TeamMember entities (including creator)
 	        List<TeamMember> teamMembers = members.stream()
 	                .map(user -> new TeamMember(savedTeam, user))
 	                .collect(Collectors.toList());
 
-	        // Save all team members (including creator)
 	        teamMemberRepository.saveAll(teamMembers);
 
-	        // Return DTO with actual saved members
 	        return new TeamDTO(
 	            team.getTeamId(),
 	            team.getTeamName(),
@@ -77,19 +68,16 @@ public class TeamServiceImpl implements TeamService{
 	
 	@Override
 	public List<TeamDTO> getUserTeams(Integer userId) {
-	    // Fetch teams created by the user
+
 		List<Team> createdTeams = teamRepository.findByCreatedBy_UserId(userId);
 
-
-	    // Fetch teams where the user is a member
 	    List<Integer> teamIds = teamMemberRepository.findTeamIdsByUserId(userId);
+	    
 	    List<Team> joinedTeams = teamRepository.findByTeamIdIn(teamIds);
 
-	    // Combine both lists and remove duplicates
 	    Set<Team> allTeams = new HashSet<>(createdTeams);
 	    allTeams.addAll(joinedTeams);
 
-	    // Convert to DTO
 	    return allTeams.stream().map(team -> new TeamDTO(
 	        team.getTeamId(),
 	        team.getTeamName(),
@@ -102,10 +90,9 @@ public class TeamServiceImpl implements TeamService{
 
 	@Override
     public List<UserDTO> getCreatorsByIds(List<Integer> creatorIds) {
-        // ✅ Fetch user details for given IDs
+		
         List<Users> users = usersRepository.findByUserIdIn(creatorIds);
         
-        // ✅ Convert to DTO list
         return users.stream()
                 .map(user -> new UserDTO(user.getUserId(), user.getUsername(), user.getEmail()))
                 .collect(Collectors.toList());

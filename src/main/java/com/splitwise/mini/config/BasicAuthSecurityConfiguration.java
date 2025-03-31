@@ -33,6 +33,16 @@ public class BasicAuthSecurityConfiguration {
     
     @Autowired
     private JwtFilter jwtFilter;
+    
+    private static final String[] PUBLIC_URLS = {
+            "/api/users/register",
+            "/api/users/login",
+            "/v3/api-docs/**",
+            "/swagger-ui/**",
+            "/swagger-ui.html",
+            "/swagger-resources/**",
+            "/webjars/**"
+        };
 
     /**
      * Configures security settings including CORS, CSRF, session management, 
@@ -44,7 +54,7 @@ public class BasicAuthSecurityConfiguration {
             .cors(cors -> cors.configurationSource(corsConfigurationSource())) // Enable CORS
             .csrf(csrf -> csrf.disable()) // Disable CSRF for stateless authentication
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/users/register", "/api/users/login").permitAll() // Public endpoints
+            		 .requestMatchers("/api/users/register","/api/users/login","/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**").permitAll() // Public endpoints
                 .anyRequest().authenticated() // Secure all other endpoints
             )
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // Stateless sessions
