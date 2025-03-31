@@ -10,17 +10,13 @@ import com.splitwise.mini.dto.UserDTO;
 import com.splitwise.mini.service.TeamMemberService;
 
 @RestController
-@RequestMapping("/api/team-members") // Base URL for team members
+@RequestMapping("/api/team-members") 
 public class TeamMemberController {
 
     @Autowired 
     private TeamMemberService teamMemberService;
 
-    /**
-     * Retrieves all members of a given team.
-     * @param teamId ID of the team whose members need to be fetched.
-     * @return ResponseEntity containing a list of team members.
-     */
+    //Retrieves all members of a given team. 
     @GetMapping("/{teamId}/members") 
     public ResponseEntity<List<UserDTO>> getTeamMembers(@PathVariable Integer teamId) {
         List<UserDTO> teamMembers = teamMemberService.getTeamMembers(teamId);

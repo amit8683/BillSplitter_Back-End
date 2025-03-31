@@ -20,10 +20,8 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.List;
 
-/**
- * Configures security settings for authentication, authorization, CORS, 
- * and JWT-based security in the Splitwise-like application.
- */
+
+//Configures security settings for authentication, authorization, CORS and JWT-based security
 @Configuration
 @EnableWebSecurity
 public class BasicAuthSecurityConfiguration {
@@ -34,39 +32,26 @@ public class BasicAuthSecurityConfiguration {
     @Autowired
     private JwtFilter jwtFilter;
     
-    private static final String[] PUBLIC_URLS = {
-            "/api/users/register",
-            "/api/users/login",
-            "/v3/api-docs/**",
-            "/swagger-ui/**",
-            "/swagger-ui.html",
-            "/swagger-resources/**",
-            "/webjars/**"
-        };
+    //Configures security settings including CORS, CSRF, session management, 
 
-    /**
-     * Configures security settings including CORS, CSRF, session management, 
-     * endpoint access control, and JWT authentication.
-     */
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            .cors(cors -> cors.configurationSource(corsConfigurationSource())) // Enable CORS
-            .csrf(csrf -> csrf.disable()) // Disable CSRF for stateless authentication
+            .cors(cors -> cors.configurationSource(corsConfigurationSource())) 
+            .csrf(csrf -> csrf.disable()) 
             .authorizeHttpRequests(auth -> auth
             		 .requestMatchers("/api/users/register","/api/users/login","/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**").permitAll() // Public endpoints
-                .anyRequest().authenticated() // Secure all other endpoints
+                .anyRequest().authenticated() 
             )
-            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // Stateless sessions
-            .httpBasic(httpBasic -> {}) // Enable basic auth (for testing)
-            .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class); // Add JWT filter
+            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) 
+            .httpBasic(httpBasic -> {})
+            .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
         
         return http.build();
     }
 
-    /**
-     * Configures authentication using a DAO-based provider with BCrypt password hashing.
-     */
+    //Configures authentication using a DAO-based provider with BCrypt password hashing.
+
     @Bean 
     public AuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
@@ -75,21 +60,19 @@ public class BasicAuthSecurityConfiguration {
         return provider;
     }
 
-    /**
-     * Provides an AuthenticationManager to handle authentication requests.
-     */
+    //Provides an AuthenticationManager to handle authentication requests.
+
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
     }
 
-    /**
-     * Configures CORS to allow requests from the frontend.
-     */
+    //Configures CORS to allow requests from the frontend.
+
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:5173")); // Allow frontend
+        configuration.setAllowedOrigins(List.of("http://localhost:5173"));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         configuration.setAllowedHeaders(List.of("Authorization", "Content-Type"));
         configuration.setAllowCredentials(true);

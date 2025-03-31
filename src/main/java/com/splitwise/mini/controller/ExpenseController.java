@@ -9,17 +9,13 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/expense") // Base path for expense-related operations
+@RequestMapping("/expense") 
 public class ExpenseController {
 
     @Autowired 
     private ExpenseService expenseService; 
 
-    /**
-     * Adds a new expense.
-     * @param expenseDTO The expense details received in the request body.
-     * @return The saved expense details.
-     */
+    //Adds a new expense.
     @PostMapping("/add")
     public ResponseEntity<ExpenseDTO> addExpense(@RequestBody ExpenseDTO expenseDTO) {
         System.out.println("Received Expense: " + expenseDTO);
@@ -28,22 +24,15 @@ public class ExpenseController {
         return ResponseEntity.ok(savedExpense);
     }
     
-    /**
-     * Retrieves all expenses for a given team.
-     * @param teamId The ID of the team whose expenses are to be fetched.
-     * @return List of expenses for the specified team.
-     */
+    //Retrieves all expenses for a given team.
     @GetMapping("/team/{teamId}") 
     public ResponseEntity<List<ExpenseDTO>> getExpensesByTeam(@PathVariable Integer teamId) {
         List<ExpenseDTO> expenses = expenseService.getExpensesByTeam(teamId);
         return ResponseEntity.ok(expenses);
     }
     
-    /**
-     * Retrieves details of a specific expense by its ID.
-     * @param expenseId The ID of the expense to retrieve.
-     * @return The expense details.
-     */
+    //Retrieves details of a specific expense by its ID.
+
     @GetMapping("/{expenseId}")
     public ResponseEntity<ExpenseDTO> getExpenseById(@PathVariable Integer expenseId) {
         ExpenseDTO expense = expenseService.getExpenseById(expenseId);

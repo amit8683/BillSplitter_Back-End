@@ -19,10 +19,8 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-/**
- * JWT authentication filter that processes each request to verify 
- * and authenticate JWT tokens before reaching secured endpoints.
- */
+
+//JWT authentication filter that processes each request to verify and authenticate
 @Component
 public class JwtFilter extends OncePerRequestFilter {
 
@@ -32,16 +30,12 @@ public class JwtFilter extends OncePerRequestFilter {
     @Autowired
     private ApplicationContext context;
 
-    /**
-     * Filters each incoming request to validate the JWT token.
-     * If valid, sets authentication in the SecurityContext.
-     */
+    //Filters each incoming request to validate the JWT token.
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
         
         String authHeader = request.getHeader("Authorization");
-        System.out.print("Yeah Auth vala " + authHeader); // Debugging log
         
         String token = "";
         String email = null;

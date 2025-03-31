@@ -17,22 +17,14 @@ public class UserController {
     @Autowired
     private UsersService usersService;
 
-    /**
-     * Registers a new user in the system.
-     * @param user User details received in the request body.
-     * @return ResponseEntity containing registered user details.
-     */
+    //Registers a new user in the system.
     @PostMapping("/register")
     public ResponseEntity<UserDTO> registerUser(@RequestBody Users user) {   
         UserDTO registeredUser = usersService.register(user);
         return ResponseEntity.ok(registeredUser);
     }
 
-    /**
-     * Authenticates a user and generates a JWT token upon successful login.
-     * @param authRequest Contains user's email and password.
-     * @return ResponseEntity containing the authentication token and user details.
-     */
+    //Authenticates a user and generates a JWT token upon successful login.  
     @PostMapping("/login")
     public ResponseEntity<AuthResponseDTO> loginUser(@RequestBody AuthRequestDTO authRequest) {
         AuthResponseDTO response = usersService.verify(authRequest);
